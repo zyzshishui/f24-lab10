@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './Quiz.css'
 import QuizQuestion from '../core/QuizQuestion';
+// Hint: Take advantage of the QuizQuestion interface
 
 interface QuizState {
   questions: QuizQuestion[]
@@ -10,6 +11,8 @@ interface QuizState {
 }
 
 const Quiz: React.FC = () => {
+  // TODO: Task1 - Seprate the logic of quiz from the UI.
+  // Hint: Take advantage of QuizCore to manage quiz state separately from the UI.
   const initialQuestions: QuizQuestion[] = [
     {
       question: 'What is the capital of France?',
@@ -30,7 +33,8 @@ const Quiz: React.FC = () => {
 
 
   const handleButtonClick = (): void => {
-    // Task3: Implement the logic for button click, such as moving to the next question.
+    // TODO: Task3 - Implement the logic for button click ("Next Question" and "Submit").
+    // Hint: You might want to check for a function in the core logic to help with this.
   } 
 
   const { questions, currentQuestionIndex, selectedAnswer, score } = state;
