@@ -1,2 +1,5 @@
-# f24-lab10
-F24 - Lab10 ReactJS/Intro to GUIS
+# Lab 9: Introduction to React.js 
+
+Handout: 
+
+https://github.com/CMU-17-214/f2024/blob/main/labs/lab10.md
