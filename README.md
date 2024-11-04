@@ -1,4 +1,4 @@
-# Lab 9: Introduction to React.js 
+# Lab 10: Introduction to React.js 
 
 Handout: 
 
