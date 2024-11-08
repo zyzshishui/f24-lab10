@@ -1,50 +1,79 @@
-import React, { useState } from 'react'
-import './Quiz.css'
+import React, { useState } from 'react';
+import './Quiz.css';
 import QuizQuestion from '../core/QuizQuestion';
+import QuizCore from '../core/QuizCore'; // Import QuizCore to manage quiz logic
+
 // Hint: Take advantage of the QuizQuestion interface
 
+// Interface for component state is no longer needed since QuizCore handles most of the state
+// However, we'll keep track of selectedAnswer and quiz completion status
 interface QuizState {
-  questions: QuizQuestion[]
-  currentQuestionIndex: number
-  selectedAnswer: string | null
-  score: number
+  selectedAnswer: string | null;
+  quizCompleted: boolean;
 }
 
 const Quiz: React.FC = () => {
-  // TODO: Task1 - Seprate the logic of quiz from the UI.
+  // TODO: Task1 - Separate the logic of quiz from the UI.
   // Hint: Take advantage of QuizCore to manage quiz state separately from the UI.
-  const initialQuestions: QuizQuestion[] = [
-    {
-      question: 'What is the capital of France?',
-      options: ['London', 'Berlin', 'Paris', 'Madrid'],
-      correctAnswer: 'Paris',
-    },
-  ];
+
+  const [quizCore] = useState(new QuizCore()); // Initialize QuizCore instance
   const [state, setState] = useState<QuizState>({
-    questions: initialQuestions,
-    currentQuestionIndex: 0,  // Initialize the current question index.
-    selectedAnswer: null,  // Initialize the selected answer.
-    score: 0,  // Initialize the score.
+    selectedAnswer: null, // Initialize the selected answer.
+    quizCompleted: false,  // Initialize quiz completion status.
   });
 
+  // Handle option selection
   const handleOptionSelect = (option: string): void => {
     setState((prevState) => ({ ...prevState, selectedAnswer: option }));
-  }
+  };
 
-
+  // Handle button click for "Next Question" and "Submit"
   const handleButtonClick = (): void => {
     // TODO: Task3 - Implement the logic for button click ("Next Question" and "Submit").
     // Hint: You might want to check for a function in the core logic to help with this.
-  } 
+    const { selectedAnswer } = state;
 
-  const { questions, currentQuestionIndex, selectedAnswer, score } = state;
-  const currentQuestion = questions[currentQuestionIndex];
+    if (selectedAnswer) {
+      // Record the user's answer and update the score
+      quizCore.answerQuestion(selectedAnswer);
 
-  if (!currentQuestion) {
+      if (quizCore.hasNextQuestion()) {
+        // Move to the next question
+        quizCore.nextQuestion();
+        // Reset the selected answer
+        setState((prevState) => ({ ...prevState, selectedAnswer: null }));
+      } else {
+        // Quiz is completed
+        setState((prevState) => ({ ...prevState, quizCompleted: true }));
+      }
+    } else {
+      alert('Please select an answer before proceeding.');
+    }
+  };
+
+  // Get current question and score from QuizCore
+  const currentQuestion = quizCore.getCurrentQuestion();
+  const score = quizCore.getScore();
+  const totalQuestions = quizCore.getTotalQuestions();
+  const { selectedAnswer, quizCompleted } = state;
+
+  // If quiz is completed, display the final score
+  if (quizCompleted) {
     return (
       <div>
         <h2>Quiz Completed</h2>
-        <p>Final Score: {score} out of {questions.length}</p>
+        <p>
+          Final Score: {score} out of {totalQuestions}
+        </p>
+      </div>
+    );
+  }
+
+  // If no current question is available, display a loading message
+  if (!currentQuestion) {
+    return (
+      <div>
+        <h2>Loading...</h2>
       </div>
     );
   }
@@ -53,24 +82,29 @@ const Quiz: React.FC = () => {
     <div>
       <h2>Quiz Question:</h2>
       <p>{currentQuestion.question}</p>
-    
+
       <h3>Answer Options:</h3>
       <ul>
         {currentQuestion.options.map((option) => (
           <li
             key={option}
             onClick={() => handleOptionSelect(option)}
-            className={selectedAnswer === option ? 'selected' : ''}
+            // Task 2: Add className attribute for highlighting selected answer
+            className={`option ${selectedAnswer === option ? 'selected' : ''}`}
           >
             {option}
           </li>
         ))}
       </ul>
 
-      <h3>Selected Answer:</h3>
-      <p>{selectedAnswer ?? 'No answer selected'}</p>
+      {/* Remove direct display of selected answer to enhance user experience */}
+      {/* <h3>Selected Answer:</h3>
+      <p>{selectedAnswer ?? 'No answer selected'}</p> */}
 
-      <button onClick={handleButtonClick}>Next Question</button>
+      {/* Change button label based on whether there is a next question */}
+      <button onClick={handleButtonClick}>
+        {quizCore.hasNextQuestion() ? 'Next Question' : 'Submit'}
+      </button>
     </div>
   );
 };
